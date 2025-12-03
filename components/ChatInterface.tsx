@@ -46,9 +46,10 @@ export const ChatInterface: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Removed isActionsOpen from dependencies to prevent auto-scroll loop closing the menu
   useEffect(() => {
     scrollToBottom();
-  }, [chatState.messages, chatState.isLoading, isActionsOpen]);
+  }, [chatState.messages, chatState.isLoading]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -237,9 +238,10 @@ export const ChatInterface: React.FC = () => {
       </div>
 
       {/* Messages Area - Flex 1 to push input to bottom */}
+      {/* CHANGED: Removed onScroll, added onClick to close menu. This fixes the immediate close bug on resize. */}
       <div 
         className="flex-1 overflow-y-auto px-4 py-6 space-y-2 scrollbar-hide"
-        onScroll={() => isActionsOpen && setIsActionsOpen(false)} // Auto-collapse on scroll
+        onClick={() => isActionsOpen && setIsActionsOpen(false)}
       >
         <div className="max-w-4xl mx-auto pb-4">
           {chatState.messages.map(msg => (
