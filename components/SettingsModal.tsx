@@ -167,7 +167,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <div className="text-blue-500">[10:00:02] NETWORK: Connected to Gemini API Gateway</div>
                 <div className="text-slate-500">[10:00:02] CONFIG: Loading user preferences...</div>
                 <div className="text-slate-500">[10:00:02] STORAGE: LocalDB mounted successfully</div>
-                <div className="text-yellow-500">[10:05:23] WARN: Image compression ratio > 80%</div>
+                <div className="text-yellow-500">[10:05:23] WARN: Image compression ratio &gt; 80%</div>
                 <div>[10:05:24] ACTION: User uploaded 'scan_maxilla.png'</div>
                 <div>[10:05:25] MODEL: Processing image tokens...</div>
                 <div className="text-green-500 animate-pulse">_</div>
