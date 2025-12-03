@@ -11,7 +11,7 @@ export const ChatInterface: React.FC = () => {
       {
         id: 'welcome',
         role: 'model',
-        text: "## ImplantAI System Ready\n\nСистема готова к работе. Выберите режим модели и загрузите данные пациента (DICOM срезы, фото) или выберите сценарий из панели действий.",
+        text: "", // Content handled by MessageBubble's special renderer
         timestamp: Date.now()
       }
     ],
@@ -46,7 +46,6 @@ export const ChatInterface: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Removed isActionsOpen from dependencies to prevent auto-scroll loop closing the menu
   useEffect(() => {
     scrollToBottom();
   }, [chatState.messages, chatState.isLoading]);
@@ -163,7 +162,7 @@ export const ChatInterface: React.FC = () => {
           {
             id: 'welcome',
             role: 'model',
-            text: "## Новая сессия\n\nКонтекст сброшен. Ожидаю данные клинического случая.",
+            text: "", 
             timestamp: Date.now()
           }
         ],
@@ -201,13 +200,13 @@ export const ChatInterface: React.FC = () => {
     <div className="flex flex-col h-full bg-medical-950 relative text-slate-200">
       
       {/* Top Bar: Controls */}
-      <div className="bg-medical-900/80 backdrop-blur-md border-b border-medical-700 px-4 py-3 flex items-center justify-between z-20 shadow-lg shrink-0">
-        <div className="flex items-center space-x-2 bg-medical-800 p-1 rounded-lg border border-medical-700">
+      <div className="bg-medical-950/80 backdrop-blur-sm border-b border-medical-800 px-4 py-3 flex items-center justify-between z-20 shrink-0">
+        <div className="flex items-center space-x-2 bg-medical-900 p-1 rounded-lg border border-medical-800">
           <button
             onClick={() => setChatState(prev => ({ ...prev, model: ModelType.FLASH }))}
             className={`flex items-center space-x-2 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
               chatState.model === ModelType.FLASH 
-                ? 'bg-medical-700 text-teal-400 shadow-sm ring-1 ring-medical-600' 
+                ? 'bg-medical-800 text-teal-400 shadow-sm ring-1 ring-medical-700' 
                 : 'text-slate-500 hover:text-slate-300'
             }`}
           >
@@ -218,7 +217,7 @@ export const ChatInterface: React.FC = () => {
             onClick={() => setChatState(prev => ({ ...prev, model: ModelType.PRO }))}
             className={`flex items-center space-x-2 px-3 py-1.5 rounded text-xs font-semibold transition-all ${
               chatState.model === ModelType.PRO 
-                ? 'bg-medical-700 text-indigo-400 shadow-sm ring-1 ring-medical-600' 
+                ? 'bg-medical-800 text-indigo-400 shadow-sm ring-1 ring-medical-700' 
                 : 'text-slate-500 hover:text-slate-300'
             }`}
           >
@@ -230,20 +229,19 @@ export const ChatInterface: React.FC = () => {
 
         <button 
           onClick={handleReset}
-          className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-all"
+          className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/10 rounded-lg transition-all"
           title="Сброс сессии"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
-      {/* Messages Area - Flex 1 to push input to bottom */}
-      {/* CHANGED: Removed onScroll, added onClick to close menu. This fixes the immediate close bug on resize. */}
+      {/* Messages Area */}
       <div 
         className="flex-1 overflow-y-auto px-4 py-6 space-y-2 scrollbar-hide"
         onClick={() => isActionsOpen && setIsActionsOpen(false)}
       >
-        <div className="max-w-4xl mx-auto pb-4">
+        <div className="max-w-3xl mx-auto pb-4">
           {chatState.messages.map(msg => (
             <MessageBubble key={msg.id} message={msg} />
           ))}
@@ -262,119 +260,113 @@ export const ChatInterface: React.FC = () => {
         </div>
       </div>
 
-      {/* Command Center - Static layout to prevent overlap */}
-      <div className="z-30 w-full bg-transparent shrink-0">
-        <div className="max-w-4xl mx-auto p-4 flex flex-col gap-3">
+      {/* Floating Command Center */}
+      <div className="z-30 w-full bg-gradient-to-t from-medical-950 via-medical-950 to-transparent pt-6 pb-2 px-4 shrink-0">
+        <div className="max-w-3xl mx-auto flex flex-col gap-3">
           
-          {/* Dynamic Collapsible Actions Panel */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isActionsOpen ? 'max-h-[300px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 translate-y-4'}`}>
-             <div className="bg-medical-900/90 backdrop-blur-md border border-medical-700 p-2 rounded-xl shadow-2xl mb-1">
-               <div className="flex gap-2 mb-2 overflow-x-auto scrollbar-hide border-b border-medical-800 pb-2">
+          {/* Collapsible Actions Panel */}
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isActionsOpen ? 'max-h-[400px] opacity-100 mb-2' : 'max-h-0 opacity-0'}`}>
+             <div className="bg-medical-900/90 backdrop-blur-md border border-medical-800 p-2 rounded-xl shadow-xl">
+               <div className="flex gap-2 mb-2 overflow-x-auto scrollbar-hide border-b border-medical-800/50 pb-2">
                  {(['all', 'diagnostic', 'surgical', 'prosthetic'] as const).map(cat => (
                    <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
                     className={`px-3 py-1 rounded text-[10px] uppercase font-bold tracking-wider transition-colors shrink-0
-                      ${activeCategory === cat ? 'bg-medical-accent text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                      ${activeCategory === cat ? 'bg-medical-800 text-white border border-medical-700' : 'text-slate-500 hover:text-slate-300 hover:bg-medical-800/50'}`}
                    >
                      {cat === 'all' ? 'All' : cat}
                    </button>
                  ))}
                </div>
                
-               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {filteredActions.map((action) => (
                   <button
                     key={action.id}
                     onClick={() => handleSubmit(undefined, action.prompt)}
-                    className="flex flex-col items-start gap-1 p-2.5 bg-medical-800 hover:bg-medical-700 border border-medical-700 hover:border-medical-600 rounded-lg text-xs transition-all w-32 shrink-0 group touch-manipulation"
+                    className="flex items-center gap-2 p-2 bg-medical-800/50 hover:bg-medical-800 border border-medical-700/50 hover:border-medical-600 rounded-lg transition-all group text-left"
                   >
-                    <div className="p-1.5 bg-medical-950 rounded-md text-medical-accent group-hover:text-white transition-colors">
-                      {getIcon(action.icon)}
+                    <div className="p-1.5 bg-medical-950 rounded text-medical-accent group-hover:text-white transition-colors shrink-0">
+                      {getIcon(action.icon, "w-3.5 h-3.5")}
                     </div>
-                    <span className="text-slate-300 font-medium leading-tight text-left">{action.label}</span>
+                    <span className="text-xs text-slate-300 font-medium line-clamp-1">{action.label}</span>
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Input Area */}
-          <div className="bg-medical-900 border border-medical-700 rounded-2xl shadow-2xl overflow-hidden focus-within:ring-2 focus-within:ring-medical-accent/50 focus-within:border-medical-accent transition-all relative">
-             
-             {/* Image Previews inside input */}
-             {selectedImages.length > 0 && (
-              <div className="flex gap-3 overflow-x-auto p-3 bg-medical-950/50 border-b border-medical-800">
-                {selectedImages.map((img, idx) => (
-                  <div key={idx} className="relative group shrink-0">
-                    <div className="h-16 w-16 rounded border border-medical-700 overflow-hidden relative">
-                      <img src={img} alt="Preview" className="h-full w-full object-cover" />
-                    </div>
-                    <button 
-                      onClick={() => removeImage(idx)}
-                      className="absolute -top-2 -right-2 bg-red-500/90 text-white rounded-full p-0.5 hover:bg-red-600 transition-colors"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <form onSubmit={(e) => handleSubmit(e)} className="flex items-end p-2 gap-2">
+          {/* Input Bar */}
+          <div className="flex items-end gap-2">
               
-              {/* Toggle Actions Panel Button */}
-              <button
+             {/* Toggle Menu */}
+             <button
                 type="button"
                 onClick={() => setIsActionsOpen(!isActionsOpen)}
-                className={`p-3 rounded-xl transition-all shrink-0 ${isActionsOpen ? 'bg-medical-800 text-medical-accent' : 'text-slate-400 hover:text-slate-200 hover:bg-medical-800'}`}
-                title={isActionsOpen ? "Скрыть инструменты" : "Показать инструменты"}
-              >
+                className={`p-3 rounded-xl transition-all shrink-0 border border-transparent ${isActionsOpen ? 'bg-medical-800 text-medical-accent border-medical-700' : 'bg-medical-900 text-slate-400 border-medical-800 hover:text-slate-200'}`}
+                title="Tools"
+             >
                 {isActionsOpen ? <ChevronDown className="w-5 h-5" /> : <LayoutGrid className="w-5 h-5" />}
-              </button>
+             </button>
 
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="p-3 text-slate-400 hover:text-medical-accent hover:bg-medical-800 rounded-xl transition-colors shrink-0"
-                title="Загрузить DICOM/Фото"
-              >
-                <Paperclip className="w-5 h-5" />
-              </button>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                multiple 
-                accept="image/*"
-                onChange={handleFileSelect}
-              />
+             {/* Main Input */}
+             <div className="flex-1 bg-medical-900 border border-medical-800 rounded-xl shadow-lg focus-within:ring-1 focus-within:ring-medical-accent focus-within:border-medical-accent/50 transition-all relative">
+                
+                {/* Image Previews */}
+                {selectedImages.length > 0 && (
+                  <div className="flex gap-2 p-2 border-b border-medical-800/50">
+                    {selectedImages.map((img, idx) => (
+                       <div key={idx} className="relative h-12 w-12 rounded overflow-hidden group">
+                          <img src={img} alt="preview" className="h-full w-full object-cover" />
+                          <button onClick={() => removeImage(idx)} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                             <X className="w-4 h-4 text-white" />
+                          </button>
+                       </div>
+                    ))}
+                  </div>
+                )}
 
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onFocus={() => isMobile && setIsActionsOpen(false)} // Auto collapse on mobile focus
-                placeholder="Опишите клиническую ситуацию..."
-                className="flex-1 bg-transparent border-none p-3 max-h-32 min-h-[48px] focus:ring-0 resize-none text-slate-100 placeholder-slate-500 text-sm font-sans"
-                rows={1}
-              />
+                <form onSubmit={(e) => handleSubmit(e)} className="flex items-end p-2 gap-2">
+                   
+                   <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2 text-slate-500 hover:text-medical-accent transition-colors shrink-0"
+                    title="Attach Files"
+                   >
+                    <Paperclip className="w-5 h-5" />
+                   </button>
+                   <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    multiple 
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                   />
 
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  type="submit"
-                  disabled={(!inputText.trim() && selectedImages.length === 0) || chatState.isLoading}
-                  className={`p-3 rounded-xl transition-all shadow-lg flex items-center justify-center
-                    ${chatState.model === ModelType.PRO 
-                      ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-900/20' 
-                      : 'bg-medical-accent hover:bg-medical-accentHover text-white shadow-teal-900/20'}
-                    disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </form>
+                   <textarea
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Describe clinical case..."
+                    className="flex-1 bg-transparent border-none p-2 max-h-32 min-h-[24px] focus:ring-0 resize-none text-slate-200 placeholder-slate-600 text-sm leading-relaxed"
+                    rows={1}
+                    style={{ height: 'auto', minHeight: '24px' }}
+                   />
+
+                   <button
+                    type="submit"
+                    disabled={(!inputText.trim() && selectedImages.length === 0) || chatState.isLoading}
+                    className="p-2 bg-medical-accent hover:bg-medical-accentHover text-white rounded-lg shadow-sm disabled:opacity-50 disabled:grayscale transition-all"
+                   >
+                    <Send className="w-4 h-4" />
+                   </button>
+                </form>
+             </div>
           </div>
+          <div className="text-[10px] text-center text-slate-600 font-mono pb-1 select-none">AI can make mistakes. Verify critical data.</div>
         </div>
       </div>
     </div>
