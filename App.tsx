@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Disclaimer } from './components/Disclaimer';
 import { ChatInterface } from './components/ChatInterface';
 import { SettingsModal } from './components/SettingsModal';
-import { Activity, ShieldCheck, History, Menu, Settings, FolderHeart, User, MoreHorizontal, Archive, Trash2, FolderOpen, ArrowUpRight } from 'lucide-react';
+import { Activity, ShieldCheck, History, Menu, Settings, FolderHeart, User, MoreHorizontal, Archive, Trash2, FolderOpen, ArrowUpRight, X } from 'lucide-react';
 import { generateId } from './services/utils';
 
 // Types for SideBar
@@ -19,6 +20,7 @@ const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   
   // State for cases
   const [cases, setCases] = useState<PatientCase[]>([
@@ -30,6 +32,19 @@ const App: React.FC = () => {
   // Menu state for sidebar items
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
+  // Handle mobile detection and sidebar behavior
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false); // Close by default on mobile
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleCreateNew = () => {
     const newCase: PatientCase = {
       id: generateId(),
@@ -40,8 +55,7 @@ const App: React.FC = () => {
     };
     setCases(prev => [newCase, ...prev]);
     setActiveCaseId(newCase.id);
-    // In a real app, this would also reset the ChatInterface
-    if(window.innerWidth < 768) setSidebarOpen(false);
+    if(isMobile) setSidebarOpen(false);
   };
 
   const handleArchive = (id: string, e: React.MouseEvent) => {
@@ -69,33 +83,54 @@ const App: React.FC = () => {
   const archivedCases = cases.filter(c => c.status === 'archived');
 
   return (
-    <div className="h-screen bg-medical-950 flex flex-col font-sans text-slate-200 overflow-hidden selection:bg-medical-accent selection:text-white">
+    // Used h-[100dvh] for mobile browsers to account for address bar
+    <div className="h-screen h-[100dvh] bg-medical-950 flex flex-col font-sans text-slate-200 overflow-hidden selection:bg-medical-accent selection:text-white">
       <Disclaimer />
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        
+        {/* Mobile Backdrop */}
+        {isMobile && sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
-        <div className={`${sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full opacity-0'} 
-          bg-medical-900 border-r border-medical-800 flex flex-col transition-all duration-300 ease-in-out absolute md:relative z-40 h-full shadow-2xl md:shadow-none`}>
+        <div className={`
+            fixed inset-y-0 left-0 z-50 md:relative md:z-0
+            ${sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:w-0'} 
+            bg-medical-900 border-r border-medical-800 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
+            ${!sidebarOpen && isMobile ? 'pointer-events-none' : ''}
+          `}>
           
           {/* Sidebar Header */}
-          <div className="p-5 border-b border-medical-800 flex items-center space-x-3 shrink-0">
-             <div className="bg-medical-800 p-2 rounded-lg border border-medical-700 shadow-inner">
-               <Activity className="w-6 h-6 text-medical-accent" />
+          <div className="p-5 border-b border-medical-800 flex items-center justify-between shrink-0">
+             <div className="flex items-center space-x-3">
+                <div className="bg-medical-800 p-2 rounded-lg border border-medical-700 shadow-inner">
+                  <Activity className="w-6 h-6 text-medical-accent" />
+                </div>
+                <div className={`${!sidebarOpen && !isMobile ? 'hidden' : 'block'} min-w-[120px]`}>
+                  <h1 className="text-lg font-bold text-slate-100 tracking-tight leading-none">ImplantAI</h1>
+                  <div className="flex items-center mt-1">
+                    <span className="relative flex h-2 w-2 mr-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                    <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">System Online</p>
+                  </div>
+                </div>
              </div>
-             <div>
-               <h1 className="text-lg font-bold text-slate-100 tracking-tight leading-none">ImplantAI</h1>
-               <div className="flex items-center mt-1">
-                 <span className="relative flex h-2 w-2 mr-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                  </span>
-                 <p className="text-[10px] text-slate-400 font-mono uppercase tracking-wider">System Online</p>
-               </div>
-             </div>
+             {isMobile && (
+               <button onClick={() => setSidebarOpen(false)} className="text-slate-400 hover:text-white p-1">
+                 <X className="w-5 h-5" />
+               </button>
+             )}
           </div>
 
-          <div className="p-4 shrink-0">
+          <div className={`p-4 shrink-0 ${!sidebarOpen && !isMobile ? 'hidden' : 'block'}`}>
              <button 
               onClick={handleCreateNew}
               className="w-full bg-medical-accent/10 hover:bg-medical-accent/20 text-medical-accent border border-medical-accent/30 hover:border-medical-accent/50 px-4 py-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-teal-900/10"
@@ -106,7 +141,7 @@ const App: React.FC = () => {
           </div>
           
           {/* Scrollable List */}
-          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6 custom-scrollbar" onClick={() => setOpenMenuId(null)}>
+          <div className={`flex-1 overflow-y-auto px-4 py-2 space-y-6 custom-scrollbar ${!sidebarOpen && !isMobile ? 'hidden' : 'block'}`} onClick={() => setOpenMenuId(null)}>
              
              {/* Active Cases */}
              <div>
@@ -122,7 +157,7 @@ const App: React.FC = () => {
                   {activeCases.map((c) => (
                     <div 
                       key={c.id} 
-                      onClick={() => setActiveCaseId(c.id)}
+                      onClick={() => { setActiveCaseId(c.id); if(isMobile) setSidebarOpen(false); }}
                       className={`relative p-3 rounded-lg border cursor-pointer transition-all group animate-in slide-in-from-left-2 duration-200
                         ${activeCaseId === c.id 
                           ? 'bg-medical-800 border-medical-600 shadow-md' 
@@ -237,7 +272,7 @@ const App: React.FC = () => {
           </div>
 
           {/* Footer */}
-           <div className="p-4 border-t border-medical-800 shrink-0 bg-medical-900">
+           <div className={`p-4 border-t border-medical-800 shrink-0 bg-medical-900 ${!sidebarOpen && !isMobile ? 'hidden' : 'block'}`}>
              <button 
               onClick={() => setIsSettingsOpen(true)}
               className="w-full flex items-center justify-between text-slate-500 hover:text-slate-300 cursor-pointer transition-colors p-2 rounded hover:bg-medical-800 group"
@@ -252,10 +287,10 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col relative h-full bg-medical-950">
+        <div className="flex-1 flex flex-col relative h-full bg-medical-950 w-full">
           
           {/* Header Mobile/Desktop */}
-          <header className="h-14 border-b border-medical-800 flex items-center justify-between px-4 bg-medical-950 shrink-0">
+          <header className="h-14 border-b border-medical-800 flex items-center justify-between px-4 bg-medical-950 shrink-0 z-10">
             <div className="flex items-center">
               <button 
                 onClick={() => setSidebarOpen(!sidebarOpen)}

@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Bot, User, Maximize2, X, AlertCircle } from 'lucide-react';
 import { Message } from '../types';
 
@@ -79,7 +81,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                 prose-td:border-slate-700 prose-td:text-slate-300
                 prose-blockquote:border-l-4 prose-blockquote:border-medical-accent prose-blockquote:bg-slate-800/50 prose-blockquote:py-1 prose-blockquote:px-4
                 `}>
-                <ReactMarkdown>{message.text}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
               </div>
             </div>
 
