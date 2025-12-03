@@ -3,55 +3,48 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  // 1. Load variables from .env file (for local development)
-  // process.cwd() ensures the correct path in the Vercel environment
+  // 1. Загружаем переменные из .env файла (для локальной разработки)
   const env = loadEnv(mode, process.cwd(), '');
-
-  // 2. Define Priority: System Variable (Vercel) > .env file
-  // Vercel injects variables into process.env during the build
-  // VERCEL_ENV is automatically set by Vercel (production, preview, development)
+  
+  // 2. Гибридная стратегия загрузки переменных (Hybrid Injection)
+  // Приоритет: Vercel System Vars > Local .env
   const apiKey = process.env.API_KEY || env.API_KEY;
-  const vercelEnv = process.env.VERCEL_ENV || 'development';
 
-  // Logging for build debugging (visible in Vercel build logs)
+  // 3. Логирование для отладки сборки (Server-Side)
+  console.log(`[Vite] Build Mode: ${mode}`);
   if (!apiKey) {
-    console.warn(`[Vite Build] ⚠️ API_KEY is missing! Environment: ${vercelEnv}`);
+    console.warn(`[Vite] ⚠️  WARNING: API_KEY is undefined. The app may fail at runtime.`);
   } else {
-    console.log(`[Vite Build] ✅ API_KEY loaded successfully. Environment: ${vercelEnv}`);
+    console.log(`[Vite] ✅ API_KEY injected successfully.`);
   }
 
   return {
-    server: {
-      port: 3000,
-      host: '0.0.0.0',
-    },
     plugins: [react()],
     resolve: {
       alias: {
-        '@': path.resolve('.'),
+        '@': path.resolve(process.cwd()), // Maps @ to project root
       },
     },
     define: {
-      // 3. Inject variable into client code.
-      // JSON.stringify is mandatory, otherwise it's inserted as code, not string.
+      // 4. Пробрасываем переменную в клиентский код
       'process.env.API_KEY': JSON.stringify(apiKey || ''),
-      'process.env.VERCEL_ENV': JSON.stringify(vercelEnv),
+      'process.env.NODE_ENV': JSON.stringify(mode),
     },
     build: {
       outDir: 'dist',
-      // Increase warning limit to 1000kb to reduce noise
+      // Увеличиваем лимит предупреждения до 1000kb (GenAI SDK достаточно тяжелый)
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          // 4. Optimization: Split dependencies into chunks for faster loading
+          // 5. Оптимизация: разделяем вендоров и код приложения
           manualChunks: {
             vendor: ['react', 'react-dom'],
             genai: ['@google/genai'],
             markdown: ['react-markdown', 'remark-gfm'],
             ui: ['lucide-react']
-          },
-        },
-      },
-    },
+          }
+        }
+      }
+    }
   };
 });

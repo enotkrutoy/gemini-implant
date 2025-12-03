@@ -15,7 +15,7 @@ export interface ChatState {
 
 export enum ModelType {
   FLASH = 'gemini-2.5-flash',
-  PRO = 'gemini-3-pro-preview'
+  PRO = 'gemini-2.5-pro'
 }
 
 export const SYSTEM_INSTRUCTION = `
