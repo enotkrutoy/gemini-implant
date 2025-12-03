@@ -16,7 +16,7 @@ export const ChatInterface: React.FC = () => {
       }
     ],
     isLoading: false,
-    model: ModelType.PRO
+    model: ModelType.FLASH // Default to FLASH for better stability
   });
 
   const [inputText, setInputText] = useState('');
@@ -122,12 +122,27 @@ export const ChatInterface: React.FC = () => {
         isLoading: false
       }));
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      
+      let errorText = "⚠️ **Internal System Error**: Не удалось получить ответ от модели. Попробуйте еще раз.";
+      
+      const errorMsg = error instanceof Error ? error.message : String(error);
+
+      if (errorMsg.includes("API_KEY")) {
+        errorText = "⚠️ **Configuration Error**: API Key не найден. Убедитесь, что переменная окружения `API_KEY` добавлена в настройках Vercel.";
+      } else if (errorMsg.includes("429")) {
+        errorText = "⚠️ **Rate Limit**: Превышен лимит запросов к API. Попробуйте позже.";
+      } else if (errorMsg.includes("400")) {
+        errorText = "⚠️ **Bad Request**: Ошибка формата запроса или изображения.";
+      } else if (errorMsg.includes("503") || errorMsg.includes("500")) {
+        errorText = "⚠️ **Service Unavailable**: Сервис модели временно недоступен. Попробуйте сменить модель на 'Fast'.";
+      }
+      
       const errorMessage: Message = {
         id: generateId(),
         role: 'model',
-        text: "⚠️ **Internal System Error**: Не удалось получить ответ от модели. Попробуйте еще раз, проверьте подключение или сократите размер загружаемых изображений.",
+        text: errorText,
         timestamp: Date.now(),
         isError: true
       };

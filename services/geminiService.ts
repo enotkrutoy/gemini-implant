@@ -47,7 +47,8 @@ const mapHistoryToContent = (messages: Message[]): Content[] => {
         role: msg.role,
         parts: parts
       };
-    });
+    })
+    .filter(content => content.parts.length > 0); // IMPORTANT: Filter out messages with empty parts to avoid 400 bad request
 };
 
 export const initializeChat = (model: string, history: Content[] = []) => {
