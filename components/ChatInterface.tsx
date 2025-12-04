@@ -115,7 +115,8 @@ export const ChatInterface: React.FC = () => {
         id: generateId(),
         role: 'model',
         text: responseText,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        model: chatState.model // Tag the message with the model used
       };
 
       setChatState(prev => ({

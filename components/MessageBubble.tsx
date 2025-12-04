@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Bot, User, X, ShieldCheck, Activity } from 'lucide-react';
-import { Message } from '../types';
+import { Bot, User, X, ShieldCheck, Activity, Sparkles, Zap, Gem, Leaf, Circle } from 'lucide-react';
+import { Message, MODEL_CONFIGS } from '../types';
 
 interface MessageBubbleProps {
   message: Message;
@@ -12,6 +13,27 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isUser = message.role === 'user';
   const isError = message.isError;
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+
+  // Helper to get icon for model tag
+  const getModelIcon = (modelId?: string) => {
+    if (!modelId) return null;
+    const config = MODEL_CONFIGS.find(c => c.id === modelId);
+    if (!config) return null;
+
+    switch (config.icon) {
+      case 'Zap': return <Zap className="w-3 h-3" />;
+      case 'Gem': return <Gem className="w-3 h-3" />;
+      case 'Leaf': return <Leaf className="w-3 h-3" />;
+      case 'Circle': return <Circle className="w-3 h-3" />;
+      default: return <Sparkles className="w-3 h-3" />;
+    }
+  };
+
+  const getModelLabel = (modelId?: string) => {
+    if (!modelId) return null;
+    const config = MODEL_CONFIGS.find(c => c.id === modelId);
+    return config ? config.label : null;
+  };
 
   // Special "Hero" rendering for the welcome message
   if (message.id === 'welcome') {
@@ -100,9 +122,19 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               </div>
             </div>
 
-            <span className={`text-[10px] mt-1 font-mono opacity-40 px-1 ${isUser ? 'text-slate-400' : 'text-slate-500'}`}>
-              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
+            <div className={`flex items-center gap-2 mt-1 px-1 opacity-50 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+              <span className={`text-[10px] font-mono ${isUser ? 'text-slate-400' : 'text-slate-500'}`}>
+                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+              
+              {/* Model Tag (Only for bot messages) */}
+              {!isUser && !isError && message.model && (
+                <div className="flex items-center gap-1 text-[10px] font-semibold text-medical-accent/80 bg-medical-800/50 px-1.5 py-0.5 rounded border border-medical-700/50">
+                  {getModelIcon(message.model)}
+                  <span>{getModelLabel(message.model)}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

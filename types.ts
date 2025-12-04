@@ -6,6 +6,7 @@ export interface Message {
   images?: string[]; // Data URLs (e.g., "data:image/png;base64,...")
   timestamp: number;
   isError?: boolean;
+  model?: string; // Tracks which model generated this message
 }
 
 export interface ChatState {
