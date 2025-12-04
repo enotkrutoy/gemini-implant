@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   // 1. Загружаем переменные из .env файла (для локальной разработки)
-  const env = loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, '.', '');
   
   // 2. Гибридная стратегия загрузки переменных (Hybrid Injection)
   // Приоритет: Vercel System Vars > Local .env
@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     resolve: {
       alias: {
-        '@': path.resolve(process.cwd()), // Maps @ to project root
+        '@': path.resolve('.'), // Maps @ to project root
       },
     },
     define: {
