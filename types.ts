@@ -1,3 +1,4 @@
+
 export interface Message {
   id: string;
   role: 'user' | 'model';
@@ -14,9 +15,18 @@ export interface ChatState {
 }
 
 export enum ModelType {
+  AUTO = 'auto',
+  PRO = 'gemini-2.5-pro',
   FLASH = 'gemini-2.5-flash',
-  PRO = 'gemini-2.5-pro'
+  LITE = 'gemini-2.5-flash-lite'
 }
+
+export const MODEL_CONFIGS = [
+  { id: ModelType.AUTO, label: "Auto (System Choice)", icon: "Circle", description: "Balanced performance" },
+  { id: ModelType.PRO, label: "Pro 2.5", icon: "Gem", description: "Complex reasoning" },
+  { id: ModelType.FLASH, label: "Flash 2.5", icon: "Zap", description: "Speed/Reasoning balance" },
+  { id: ModelType.LITE, label: "Flash Lite 2.5", icon: "Leaf", description: "Simple/Fast" },
+];
 
 export const SYSTEM_INSTRUCTION = `
 Ты — ImplantAI, передовая система поддержки принятия клинических решений (CDSS) для имплантологов.

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Chat, Content, Part } from "@google/genai";
 import { SYSTEM_INSTRUCTION, ModelType, Message } from "../types";
 
@@ -14,6 +15,14 @@ const getGenAI = (): GoogleGenAI => {
     genAI = new GoogleGenAI({ apiKey });
   }
   return genAI;
+};
+
+// Resolve UI "Auto" selection to a concrete model ID
+const resolveModel = (model: string): string => {
+  if (model === ModelType.AUTO) {
+    return ModelType.FLASH; // Default strategy for Auto is Flash 2.5
+  }
+  return model;
 };
 
 // Helper to convert UI messages to SDK Content format
@@ -52,16 +61,17 @@ const mapHistoryToContent = (messages: Message[]): Content[] => {
 };
 
 export const initializeChat = (model: string, history: Content[] = []) => {
+  const resolvedModel = resolveModel(model);
   const ai = getGenAI();
   chatSession = ai.chats.create({
-    model: model,
+    model: resolvedModel,
     history: history,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
       temperature: 0.4,
     },
   });
-  currentModel = model;
+  currentModel = model; // Store the original selection (including 'auto') to track state
 };
 
 export const resetSession = () => {
