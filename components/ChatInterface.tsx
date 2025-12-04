@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Loader2, X, Zap, Brain, Sparkles, ScanEye, FileText, AlertTriangle, Syringe, Clock, Activity, Trash2, LayoutGrid, ChevronDown, Leaf, Circle, Gem } from 'lucide-react';
 import { Message, ChatState, ModelType, QUICK_ACTIONS, ActionCategory, MODEL_CONFIGS } from '../types';
@@ -215,7 +214,7 @@ export const ChatInterface: React.FC = () => {
         <div className="relative">
           <button 
             onClick={() => setIsModelMenuOpen(!isModelMenuOpen)}
-            className="flex items-center space-x-2 bg-medical-900 px-3 py-1.5 rounded-lg border border-medical-800 hover:border-medical-700 transition-all min-w-[140px] shadow-sm"
+            className="flex items-center space-x-2 bg-medical-900 px-3 py-2 rounded-lg border border-medical-800 hover:border-medical-700 transition-all min-w-[140px] shadow-sm active:bg-medical-800"
           >
              {getIcon(activeModelConfig.icon, "w-3.5 h-3.5 text-medical-accent")}
              <span className="text-xs font-semibold text-slate-200">{activeModelConfig.label}</span>
@@ -235,7 +234,7 @@ export const ChatInterface: React.FC = () => {
                               setChatState(prev => ({ ...prev, model: conf.id }));
                               setIsModelMenuOpen(false);
                            }}
-                           className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-all text-left group
+                           className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg transition-all text-left group
                               ${chatState.model === conf.id 
                                  ? 'bg-medical-800 text-white shadow-sm ring-1 ring-medical-700' 
                                  : 'text-slate-400 hover:bg-medical-800/50 hover:text-slate-200'}`}
@@ -258,16 +257,16 @@ export const ChatInterface: React.FC = () => {
 
         <button 
           onClick={handleReset}
-          className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-900/10 rounded-lg transition-all"
+          className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-900/10 rounded-lg transition-all active:scale-95"
           title="Сброс сессии"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-5 h-5 md:w-4 md:h-4" />
         </button>
       </div>
 
       {/* Messages Area */}
       <div 
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-2 scrollbar-hide"
+        className="flex-1 overflow-y-auto px-4 py-6 space-y-2 scrollbar-hide active:cursor-default"
         onClick={() => isActionsOpen && setIsActionsOpen(false)}
       >
         <div className="max-w-3xl mx-auto pb-4">
@@ -290,8 +289,8 @@ export const ChatInterface: React.FC = () => {
       </div>
 
       {/* Floating Command Center */}
-      <div className="z-30 w-full bg-gradient-to-t from-medical-950 via-medical-950 to-transparent pt-6 pb-2 px-4 shrink-0">
-        <div className="max-w-3xl mx-auto flex flex-col gap-3">
+      <div className="z-30 w-full bg-gradient-to-t from-medical-950 via-medical-950 to-transparent pt-6 px-4 shrink-0 pb-safe">
+        <div className="max-w-3xl mx-auto flex flex-col gap-3 pb-2">
           
           {/* Collapsible Actions Panel */}
           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isActionsOpen ? 'max-h-[400px] opacity-100 mb-2' : 'max-h-0 opacity-0'}`}>
@@ -301,7 +300,7 @@ export const ChatInterface: React.FC = () => {
                    <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-3 py-1 rounded text-[10px] uppercase font-bold tracking-wider transition-colors shrink-0
+                    className={`px-3 py-2 rounded-md text-[10px] uppercase font-bold tracking-wider transition-colors shrink-0
                       ${activeCategory === cat ? 'bg-medical-800 text-white border border-medical-700' : 'text-slate-500 hover:text-slate-300 hover:bg-medical-800/50'}`}
                    >
                      {cat === 'all' ? 'All' : cat}
@@ -314,10 +313,10 @@ export const ChatInterface: React.FC = () => {
                   <button
                     key={action.id}
                     onClick={() => handleSubmit(undefined, action.prompt)}
-                    className="flex items-center gap-2 p-2 bg-medical-800/50 hover:bg-medical-800 border border-medical-700/50 hover:border-medical-600 rounded-lg transition-all group text-left"
+                    className="flex items-center gap-2 p-3 bg-medical-800/50 hover:bg-medical-800 border border-medical-700/50 hover:border-medical-600 rounded-lg transition-all group text-left active:scale-95"
                   >
                     <div className="p-1.5 bg-medical-950 rounded text-medical-accent group-hover:text-white transition-colors shrink-0">
-                      {getIcon(action.icon, "w-3.5 h-3.5")}
+                      {getIcon(action.icon, "w-4 h-4")}
                     </div>
                     <span className="text-xs text-slate-300 font-medium line-clamp-1">{action.label}</span>
                   </button>
@@ -336,7 +335,7 @@ export const ChatInterface: React.FC = () => {
                 className={`p-3 rounded-xl transition-all shrink-0 border border-transparent ${isActionsOpen ? 'bg-medical-800 text-medical-accent border-medical-700' : 'bg-medical-900 text-slate-400 border-medical-800 hover:text-slate-200'}`}
                 title="Tools"
              >
-                {isActionsOpen ? <ChevronDown className="w-5 h-5" /> : <LayoutGrid className="w-5 h-5" />}
+                {isActionsOpen ? <ChevronDown className="w-6 h-6" /> : <LayoutGrid className="w-6 h-6" />}
              </button>
 
              {/* Main Input */}
@@ -344,12 +343,12 @@ export const ChatInterface: React.FC = () => {
                 
                 {/* Image Previews */}
                 {selectedImages.length > 0 && (
-                  <div className="flex gap-2 p-2 border-b border-medical-800/50">
+                  <div className="flex gap-2 p-2 border-b border-medical-800/50 overflow-x-auto">
                     {selectedImages.map((img, idx) => (
-                       <div key={idx} className="relative h-12 w-12 rounded overflow-hidden group">
+                       <div key={idx} className="relative h-14 w-14 rounded overflow-hidden group shrink-0">
                           <img src={img} alt="preview" className="h-full w-full object-cover" />
-                          <button onClick={() => removeImage(idx)} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                             <X className="w-4 h-4 text-white" />
+                          <button onClick={() => removeImage(idx)} className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                             <X className="w-5 h-5 text-white" />
                           </button>
                        </div>
                     ))}
@@ -361,7 +360,7 @@ export const ChatInterface: React.FC = () => {
                    <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 text-slate-500 hover:text-medical-accent transition-colors shrink-0"
+                    className="p-2.5 text-slate-500 hover:text-medical-accent transition-colors shrink-0"
                     title="Attach Files"
                    >
                     <Paperclip className="w-5 h-5" />
@@ -380,17 +379,17 @@ export const ChatInterface: React.FC = () => {
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Describe clinical case..."
-                    className="flex-1 bg-transparent border-none p-2 max-h-32 min-h-[24px] focus:ring-0 resize-none text-slate-200 placeholder-slate-600 text-sm leading-relaxed"
+                    className="flex-1 bg-transparent border-none p-2.5 max-h-32 min-h-[44px] focus:ring-0 resize-none text-slate-200 placeholder-slate-600 text-base leading-relaxed"
                     rows={1}
-                    style={{ height: 'auto', minHeight: '24px' }}
+                    style={{ height: 'auto' }}
                    />
 
                    <button
                     type="submit"
                     disabled={(!inputText.trim() && selectedImages.length === 0) || chatState.isLoading}
-                    className="p-2 bg-medical-accent hover:bg-medical-accentHover text-white rounded-lg shadow-sm disabled:opacity-50 disabled:grayscale transition-all"
+                    className="p-2.5 bg-medical-accent hover:bg-medical-accentHover text-white rounded-lg shadow-sm disabled:opacity-50 disabled:grayscale transition-all active:scale-95"
                    >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-5 h-5" />
                    </button>
                 </form>
              </div>

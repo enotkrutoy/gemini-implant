@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Disclaimer } from './components/Disclaimer';
 import { ChatInterface } from './components/ChatInterface';
@@ -104,6 +103,7 @@ const App: React.FC = () => {
             ${sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:w-0'} 
             bg-medical-900 border-r border-medical-800 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
             ${!sidebarOpen && isMobile ? 'pointer-events-none' : ''}
+            pt-safe pb-safe
           `}>
           
           {/* Sidebar Header */}
@@ -133,7 +133,7 @@ const App: React.FC = () => {
           <div className={`p-4 shrink-0 ${!sidebarOpen && !isMobile ? 'hidden' : 'block'}`}>
              <button 
               onClick={handleCreateNew}
-              className="w-full bg-medical-accent/10 hover:bg-medical-accent/20 text-medical-accent border border-medical-accent/30 hover:border-medical-accent/50 px-4 py-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-teal-900/10"
+              className="w-full bg-medical-accent/10 hover:bg-medical-accent/20 text-medical-accent border border-medical-accent/30 hover:border-medical-accent/50 px-4 py-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-teal-900/10 active:scale-95"
             >
               <User className="w-4 h-4" />
               <span>Новый пациент</span>
@@ -158,7 +158,7 @@ const App: React.FC = () => {
                     <div 
                       key={c.id} 
                       onClick={() => { setActiveCaseId(c.id); if(isMobile) setSidebarOpen(false); }}
-                      className={`relative p-3 rounded-lg border cursor-pointer transition-all group animate-in slide-in-from-left-2 duration-200
+                      className={`relative p-3 rounded-lg border cursor-pointer transition-all group animate-in slide-in-from-left-2 duration-200 active:bg-medical-800
                         ${activeCaseId === c.id 
                           ? 'bg-medical-800 border-medical-600 shadow-md' 
                           : 'bg-medical-950/30 border-medical-800 hover:bg-medical-800 hover:border-medical-700'}`}
@@ -171,6 +171,8 @@ const App: React.FC = () => {
                               setOpenMenuId(openMenuId === c.id ? null : c.id);
                             }}
                             className={`p-1 -mt-1 -mr-1 rounded-md text-slate-500 hover:text-white transition-colors ${openMenuId === c.id ? 'bg-medical-700 text-white' : 'opacity-0 group-hover:opacity-100'}`}
+                            // Always visible on touch devices for better UX
+                            style={{ opacity: isMobile ? 1 : undefined }}
                           >
                            <MoreHorizontal className="w-4 h-4" />
                          </button>
@@ -185,13 +187,13 @@ const App: React.FC = () => {
                          <div className="absolute right-2 top-8 w-32 bg-medical-900 border border-medical-700 shadow-xl rounded-lg z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                            <button 
                             onClick={(e) => handleArchive(c.id, e)}
-                            className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-medical-800 hover:text-white flex items-center gap-2"
+                            className="w-full text-left px-3 py-3 text-xs text-slate-300 hover:bg-medical-800 hover:text-white flex items-center gap-2 active:bg-medical-700"
                            >
                              <Archive className="w-3 h-3" /> Archive
                            </button>
                            <button 
                             onClick={(e) => handleDelete(c.id, e)}
-                            className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-900/30 flex items-center gap-2"
+                            className="w-full text-left px-3 py-3 text-xs text-red-400 hover:bg-red-900/30 flex items-center gap-2 active:bg-red-900/50"
                            >
                              <Trash2 className="w-3 h-3" /> Delete
                            </button>
@@ -206,7 +208,7 @@ const App: React.FC = () => {
              <div>
                 <button 
                   onClick={() => setShowArchived(!showArchived)}
-                  className="flex items-center justify-between w-full text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1 hover:text-slate-300 transition-colors"
+                  className="flex items-center justify-between w-full text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1 hover:text-slate-300 transition-colors py-2"
                 >
                   <span className="flex items-center"><FolderOpen className="w-3 h-3 mr-2" /> Archived ({archivedCases.length})</span>
                   <span className={`transition-transform duration-200 ${showArchived ? 'rotate-180' : ''}`}>▼</span>
@@ -238,13 +240,13 @@ const App: React.FC = () => {
                           <div className="absolute right-2 top-8 w-32 bg-medical-900 border border-medical-700 shadow-xl rounded-lg z-50 overflow-hidden">
                             <button 
                               onClick={(e) => handleRestore(c.id, e)}
-                              className="w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-medical-800 hover:text-white flex items-center gap-2"
+                              className="w-full text-left px-3 py-3 text-xs text-slate-300 hover:bg-medical-800 hover:text-white flex items-center gap-2 active:bg-medical-700"
                             >
                               <ArrowUpRight className="w-3 h-3" /> Restore
                             </button>
                             <button 
                               onClick={(e) => handleDelete(c.id, e)}
-                              className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-900/30 flex items-center gap-2"
+                              className="w-full text-left px-3 py-3 text-xs text-red-400 hover:bg-red-900/30 flex items-center gap-2 active:bg-red-900/50"
                             >
                               <Trash2 className="w-3 h-3" /> Delete
                             </button>
@@ -263,7 +265,7 @@ const App: React.FC = () => {
                </h2>
                <div className="space-y-1">
                  {['ITI Standard', 'Immediate Loading', 'Sinus Lift Lateral'].map((item) => (
-                   <div key={item} className="text-xs text-slate-400 hover:text-medical-accent hover:bg-medical-800/50 px-2 py-2 rounded cursor-pointer transition-colors">
+                   <div key={item} className="text-xs text-slate-400 hover:text-medical-accent hover:bg-medical-800/50 px-2 py-3 rounded cursor-pointer transition-colors active:bg-medical-800">
                      {item}
                    </div>
                  ))}
@@ -290,21 +292,25 @@ const App: React.FC = () => {
         <div className="flex-1 flex flex-col relative h-full bg-medical-950 w-full">
           
           {/* Header Mobile/Desktop */}
-          <header className="h-14 border-b border-medical-800 flex items-center justify-between px-4 bg-medical-950 shrink-0 z-10">
+          <header className="h-14 border-b border-medical-800 flex items-center justify-between px-4 bg-medical-950 shrink-0 z-10 pt-safe">
             <div className="flex items-center">
               <button 
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="text-slate-400 hover:text-white p-2 hover:bg-medical-800 rounded-lg transition-colors mr-2"
+                className="text-slate-400 hover:text-white p-2 hover:bg-medical-800 rounded-lg transition-colors mr-2 active:bg-medical-800"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <span className="md:hidden font-bold text-slate-100">ImplantAI</span>
+              <span className="md:hidden font-bold text-slate-100 text-sm">ImplantAI</span>
             </div>
             
             <div className="flex items-center space-x-4">
                <div className="hidden md:flex items-center text-[10px] uppercase tracking-wider font-bold text-medical-accent bg-medical-900/50 px-3 py-1.5 rounded border border-medical-800/50 shadow-sm">
                   <ShieldCheck className="w-3 h-3 mr-2" />
-                  HIPAA Compliant Mode
+                  HIPAA Compliant
+               </div>
+               {/* Mobile secure badge */}
+               <div className="md:hidden flex items-center text-medical-accent">
+                 <ShieldCheck className="w-4 h-4" />
                </div>
             </div>
           </header>
