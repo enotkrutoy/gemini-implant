@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Loader2, X, Zap, Brain, Sparkles, ScanEye, FileText, AlertTriangle, Syringe, Clock, Activity, Trash2, LayoutGrid, ChevronDown, Leaf, Circle, Gem } from 'lucide-react';
+import { Send, Paperclip, Loader2, X, Zap, Brain, Sparkles, ScanEye, FileText, AlertTriangle, Syringe, Clock, Activity, Trash2, LayoutGrid, ChevronDown, Leaf, Circle, Gem, ShieldCheck } from 'lucide-react';
 import { Message, ChatState, ModelType, QUICK_ACTIONS, ActionCategory, MODEL_CONFIGS } from '../types';
 import { MessageBubble } from './MessageBubble';
 import { sendMessageToGemini, resetSession } from '../services/geminiService';
@@ -183,6 +184,7 @@ export const ChatInterface: React.FC = () => {
       case 'Gem': return <Gem className={className} />;
       case 'Leaf': return <Leaf className={className} />;
       case 'Circle': return <Circle className={className} />;
+      case 'ShieldCheck': return <ShieldCheck className={className} />;
       default: return <Sparkles className={className} />;
     }
   };
@@ -277,7 +279,10 @@ export const ChatInterface: React.FC = () => {
             <div className="flex justify-start mb-6 animate-pulse">
               <div className="bg-medical-800/50 border border-medical-700 rounded-2xl rounded-tl-sm p-4 flex items-center space-x-3">
                 <Loader2 className="w-5 h-5 animate-spin text-medical-accent" />
-                <span className="text-sm text-slate-400 font-mono">Thinking...</span>
+                <span className="text-sm text-slate-400 font-mono">
+                   {/* Dynamic status to match user request theme */}
+                   Thinking: [Problem] -> [Diagnosis]...
+                </span>
               </div>
             </div>
           )}
@@ -368,7 +373,7 @@ export const ChatInterface: React.FC = () => {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Describe case..."
+                    placeholder="Describe case for [Verification]..."
                     className="flex-1 bg-transparent border-none p-2 max-h-24 min-h-[40px] focus:ring-0 resize-none text-slate-200 placeholder-slate-600 text-base leading-normal"
                     rows={1}
                    />
