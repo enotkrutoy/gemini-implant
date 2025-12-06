@@ -360,12 +360,18 @@ export const ChatInterface: React.FC = () => {
                    >
                     <Paperclip className="w-5 h-5" />
                    </button>
+                   {/* 
+                     ANDROID FIX: 
+                     Using "hidden" class (display: none) prevents programmatic click on some Android WebViews.
+                     Instead, we use 0 size and 0 opacity but keep it in the layout flow.
+                     We also expanded accept attribute to ensure Gallery/Camera intents trigger correctly.
+                   */}
                    <input 
                     type="file" 
                     ref={fileInputRef} 
-                    className="hidden" 
+                    className="absolute opacity-0 w-px h-px overflow-hidden -z-10 pointer-events-none" 
                     multiple 
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/heic, image/*"
                     onChange={handleFileSelect}
                    />
 
